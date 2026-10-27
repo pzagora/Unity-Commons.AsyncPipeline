@@ -1,9 +1,12 @@
 {
   "name": "com.zagoradev.unity.commons.asyncpipeline",
   "displayName": "Unity Commons Async Pipeline (zagora.dev)",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "unity": "6000.0",
   "description": "AsyncPipeline<TStepId> (compiles into the Commons assembly) — a fluent builder for running a sequence of asynchronous (UniTask) steps with weighted progress reporting, cancellation, automatic logging and per-step callbacks.",
+  "documentationUrl": "https://github.com/pzagora/Unity-Commons.AsyncPipeline/blob/main/README.md",
+  "changelogUrl": "https://github.com/pzagora/Unity-Commons.AsyncPipeline/blob/main/CHANGELOG.md",
+  "licensesUrl": "https://github.com/pzagora/Unity-Commons.AsyncPipeline/blob/main/LICENSE.md",
   "author": {
     "name": "Piotr Zagóra",
     "email": "piotr@zagora.dev",
