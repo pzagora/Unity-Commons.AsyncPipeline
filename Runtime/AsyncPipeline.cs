@@ -272,34 +272,34 @@ namespace Commons.AsyncPipeline
         public delegate UniTask StepFunc(IProgress<float> progress, CancellationToken ct);
 
         private void LogPipelineStart()
-            => Report.Event(LOG_STARTED_PIPELINE, sourceName: _path);
+            => CommonsLog.Event(_path, LOG_STARTED_PIPELINE);
 
         private void LogStepStart(TStepId id)
         {
-            Report.Event(string.Format(LOG_STARTED_STEP, id), sourceName: _path);
+            CommonsLog.Event(_path, string.Format(LOG_STARTED_STEP, id));
             _onStepStart?.Invoke(id);
         }
 
         private void LogStepCanceled(TStepId id)
         {
-            Report.Event(string.Format(LOG_CANCELED_ON_STEP, id), sourceName: _path);
+            CommonsLog.Event(_path, string.Format(LOG_CANCELED_ON_STEP, id));
             _onStepCanceled?.Invoke(id);
         }
 
         private void LogStepComplete(TStepId id, float progress)
         {
-            Report.Event(string.Format(LOG_FINISHED_STEP, progress, id), true, sourceName: _path);
+            CommonsLog.Event(_path, string.Format(LOG_FINISHED_STEP, progress, id), true);
             _onStepComplete?.Invoke(id);
         }
 
         private void LogStepError(TStepId id, Exception ex)
         {
-            Report.Event(string.Format(LOG_FAILED_ON_STEP, id), false, sourceName: _path);
-            Report.Exception(ex, sourceName: _path);
+            CommonsLog.Event(_path, string.Format(LOG_FAILED_ON_STEP, id), false);
+            CommonsLog.Exception(_path, ex);
             _onStepError?.Invoke(id, ex);
         }
 
         private void LogPipelineComplete()
-            => Report.Event(LOG_FINISHED_PIPELINE, sourceName: _path);
+            => CommonsLog.Event(_path, LOG_FINISHED_PIPELINE);
     }
 }

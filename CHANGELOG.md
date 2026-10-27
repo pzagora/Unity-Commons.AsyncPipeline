@@ -2,6 +2,12 @@
 
 All notable changes to this package are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this package adheres to Semantic Versioning.
 
+## [2.0.0]
+
+### Changed
+- **BREAKING:** No longer its own assembly. `Runtime/` now carries a `.asmref` into the `Commons` assembly (like Commons.Pooling and Commons.Services), so remove `Commons.AsyncPipeline` from your `.asmdef` references; the namespace stays `Commons.AsyncPipeline`.
+- Dropped the dependency on Unity Reporter. Pipeline logging goes through `CommonsLog` (Unity Commons 2.1.0+), which uses Reporter when it is in the project and the Unity console otherwise.
+
 ## [1.0.0]
 
 ### Added

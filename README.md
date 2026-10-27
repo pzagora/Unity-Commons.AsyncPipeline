@@ -2,7 +2,7 @@
 
 `AsyncPipeline<TStepId>` — a fluent builder for running a sequence of asynchronous steps with **weighted progress**, cancellation, automatic logging and per-step callbacks.
 
-Its own assembly (`Commons.AsyncPipeline`) that depends on [Unity Commons](https://github.com/pzagora/Unity-Commons) and [Unity Reporter](https://github.com/pzagora/Unity-Reporter), and runs on [UniTask](https://github.com/Cysharp/UniTask) — which is why it ships as a separate package rather than compiling into the Commons assembly (the core stays free of Reporter and UniTask).
+**Not standalone**: `Runtime/` carries a `.asmref` pointing at the `Commons` assembly, so the code compiles **into** [Unity Commons](https://github.com/pzagora/Unity-Commons) (namespace `Commons.AsyncPipeline`) and needs no separate assembly reference. It runs on [UniTask](https://github.com/Cysharp/UniTask). Logs go through `CommonsLog`, so they use [Unity Reporter](https://github.com/pzagora/Unity-Reporter) when it is in the project and the Unity console otherwise — Reporter is optional.
 
 ## Installation
 
@@ -33,4 +33,4 @@ await pipeline.RunAsync(progress, cancellationToken);
 - **Weighted progress** — each step contributes to a `[0, 1]` progress stream; unspecified weights are distributed evenly across the remaining budget, and the sum of explicit weights may not exceed `1.0`.
 - **Nesting** — a pipeline is a step: `StepFor(inner.RunAsync)` composes pipelines, and progress paths nest in the logs (`Boot -> Inner`).
 - **Steps** — build one with `AsyncPipeline.StepFor` (or `AsyncPipeline<TStepId>.StepFor` for a non-string id); it accepts a `UniTask`- or `Task`-returning function, or an `Action` for a synchronous step.
-- **Logging** — start, per-step, cancellation, failure and completion are reported through `Report` automatically; `OnStepStart/Canceled/Complete/Error` attach extra handlers without replacing it.
+- **Logging** — start, per-step, cancellation, failure and completion are reported through `CommonsLog` automatically (Reporter when present); `OnStepStart/Canceled/Complete/Error` attach extra handlers without replacing it.
