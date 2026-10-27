@@ -6,10 +6,16 @@
 
 ## Installation
 
-Add to `Packages/manifest.json` (its dependencies are declared in `package.json`):
+Install from the zagora.dev UPM registry — add the scoped registry (and OpenUPM, for UniTask) to `Packages/manifest.json`, then the package; its dependencies install automatically:
 
 ```json
-"com.zagoradev.unity.commons.asyncpipeline": "https://github.com/pzagora/Unity-Commons.AsyncPipeline.git"
+"scopedRegistries": [
+    { "name": "zagora.dev", "url": "https://upm.zagora.dev", "scopes": [ "com.zagoradev" ] },
+    { "name": "OpenUPM", "url": "https://package.openupm.com", "scopes": [ "com.cysharp" ] }
+],
+"dependencies": {
+  "com.zagoradev.unity.commons.asyncpipeline": "2.0.2"
+}
 ```
 
 Requires Unity `6000.0+`.
