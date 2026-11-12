@@ -2,6 +2,16 @@
 
 All notable changes to this package are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this package adheres to Semantic Versioning.
 
+## [2.1.0]
+
+### Added
+- Optional `failFast` policy on `Create`, which stops the pipeline and propagates the first step exception or cancellation.
+- Tests covering default tolerant behavior, fail-fast exceptions, cancellation and nested pipelines.
+
+### Changed
+- Renamed the pipeline builder entry point from `Start` to `Create`; `RunAsync` remains the execution boundary.
+- Removed the builder overload that accepted the first step; all steps are now declared consistently with `Then`.
+
 ## [2.0.4]
 
 ### Changed

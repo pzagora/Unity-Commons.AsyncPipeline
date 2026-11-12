@@ -14,7 +14,7 @@ Install from the zagora.dev UPM registry — add the scoped registry (and OpenUP
     { "name": "OpenUPM", "url": "https://package.openupm.com", "scopes": [ "com.cysharp" ] }
 ],
 "dependencies": {
-  "com.zagoradev.unity.commons.asyncpipeline": "2.0.4"
+  "com.zagoradev.unity.commons.asyncpipeline": "2.1.0"
 }
 ```
 
@@ -27,7 +27,7 @@ using Commons.AsyncPipeline;
 
 // Step ids default to string via the non-generic entry point; use AsyncPipeline<MyEnum> for another id type.
 var pipeline = AsyncPipeline
-    .Start("Boot")
+    .Create("Boot", failFast: true)
     .Then("Localization", AsyncPipeline.StepFor(_localization.Initialize))
     .Then("Scene",        AsyncPipeline.StepFor(LoadSceneAsync), weight: 0.5f)
     .OnStepError((id, ex) => /* extra handling; default logging still runs */);
@@ -35,8 +35,9 @@ var pipeline = AsyncPipeline
 await pipeline.RunAsync(progress, cancellationToken);
 ```
 
-- **Step id type** — `AsyncPipeline.Start(...)` defaults ids to `string`; use the generic `AsyncPipeline<TStepId>.Start(...)` (e.g. `AsyncPipeline<MyEnum>`) for another id type.
+- **Step id type** — `AsyncPipeline.Create(...)` defaults ids to `string`; use the generic `AsyncPipeline<TStepId>.Create(...)` (e.g. `AsyncPipeline<MyEnum>`) for another id type.
 - **Weighted progress** — each step contributes to a `[0, 1]` progress stream; unspecified weights are distributed evenly across the remaining budget, and the sum of explicit weights may not exceed `1.0`.
 - **Nesting** — a pipeline is a step: `StepFor(inner.RunAsync)` composes pipelines, and progress paths nest in the logs (`Boot -> Inner`).
+- **Failure behavior** — by default, a failed or canceled step is logged and the pipeline continues. Pass `failFast: true` to `Create` to stop immediately and propagate the original exception or cancellation. Enable it on nested pipelines whose failures must propagate to their parent.
 - **Steps** — build one with `AsyncPipeline.StepFor` (or `AsyncPipeline<TStepId>.StepFor` for a non-string id); it accepts a `UniTask`- or `Task`-returning function, or an `Action` for a synchronous step.
 - **Logging** — start, per-step, cancellation, failure and completion are reported through `CommonsLog` automatically (Reporter when present); `OnStepStart/Canceled/Complete/Error` attach extra handlers without replacing it.

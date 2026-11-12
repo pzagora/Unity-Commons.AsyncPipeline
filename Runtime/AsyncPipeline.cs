@@ -14,13 +14,9 @@ namespace Commons.AsyncPipeline
     /// </summary>
     public static class AsyncPipeline
     {
-        /// <inheritdoc cref="AsyncPipeline{TStepId}.Start(string)"/>
-        public static AsyncPipeline<string> Start(string name = null)
-            => AsyncPipeline<string>.Start(name);
-
-        /// <inheritdoc cref="AsyncPipeline{TStepId}.Start(TStepId, AsyncPipeline{TStepId}.StepFunc, float?)"/>
-        public static AsyncPipeline<string> Start(string id, AsyncPipeline<string>.StepFunc func, float? weight = null)
-            => AsyncPipeline<string>.Start(id, func, weight);
+        /// <inheritdoc cref="AsyncPipeline{TStepId}.Create(string, bool)"/>
+        public static AsyncPipeline<string> Create(string name = null, bool failFast = false)
+            => AsyncPipeline<string>.Create(name, failFast);
 
         /// <inheritdoc cref="AsyncPipeline{TStepId}.StepFor(System.Func{System.IProgress{float}, System.Threading.CancellationToken, Cysharp.Threading.Tasks.UniTask})"/>
         public static AsyncPipeline<string>.StepFunc StepFor(Func<IProgress<float>, CancellationToken, UniTask> action)
@@ -42,6 +38,7 @@ namespace Commons.AsyncPipeline
     public class AsyncPipeline<TStepId>
     {
         private readonly string _name;
+        private readonly bool _failFast;
         private string _path;
 
         private readonly List<Step<TStepId>> _steps = new();
@@ -63,40 +60,20 @@ namespace Commons.AsyncPipeline
         private const string LOG_FINISHED_PIPELINE = "Finished pipeline";
         private const string LOG_EXCEPTION_WEIGH = "Sum of specified weights exceeds 1.0";
 
-        private AsyncPipeline(string name = null)
+        private AsyncPipeline(string name = null, bool failFast = false)
         {
             _name = name ?? nameof(AsyncPipeline);
+            _failFast = failFast;
         }
 
         /// <summary>
-        /// Defines start of the pipeline.
+        /// Creates an empty pipeline.
         /// </summary>
         /// <param name="name">Pipeline identifier</param>
+        /// <param name="failFast">Whether to stop and propagate the first step exception or cancellation.</param>
         /// <returns>An instance of the pipeline.</returns>
-        public static AsyncPipeline<TStepId> Start(string name = null)
-            => new(name);
-
-        /// <summary>
-        /// Defines start of the pipeline along with the first step.
-        /// </summary>
-        /// <param name="id">Identifier of the step.</param>
-        /// <param name="func">Asynchronous function of the step.</param>
-        /// <param name="weight">
-        /// Optional relative weight of the step in the progress calculation.
-        /// If null, weight will be distributed automatically.</param>
-        /// <returns>The pipeline instance.</returns>
-        public static AsyncPipeline<TStepId> Start(TStepId id, StepFunc func, float? weight = null)
-        {
-            var pipeline = new AsyncPipeline<TStepId>();
-            pipeline._steps.Add(new Step<TStepId>
-            {
-                id = id,
-                func = func,
-                weight = weight ?? NumericExtensions.Zero,
-                weightSpecified = weight.HasValue
-            });
-            return pipeline;
-        }
+        public static AsyncPipeline<TStepId> Create(string name = null, bool failFast = false)
+            => new(name, failFast);
 
         /// <summary>
         /// Adds step to the pipeline.
@@ -248,10 +225,16 @@ namespace Commons.AsyncPipeline
                     catch (OperationCanceledException)
                     {
                         LogStepCanceled(step.id);
+
+                        if (_failFast)
+                            throw;
                     }
                     catch (Exception ex)
                     {
                         LogStepError(step.id, ex);
+
+                        if (_failFast)
+                            throw;
                     }
                 }
 
